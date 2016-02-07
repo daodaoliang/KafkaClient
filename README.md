@@ -5,6 +5,7 @@ Quickstart
 ----------
 
 Get [Ubuntu](http://www.ubuntu.com/download/desktop)
+
 Get latest [Confluent platform](http://www.confluent.io/developer#download) 
 
 Extract Confluent platform, then run the following commands:
