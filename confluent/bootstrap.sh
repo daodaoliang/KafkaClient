@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
 
-sudo apt-get update
-sudo apt-get -y install python-software-properties
-sudo apt-get -y install openjdk-7-jre-headless
-sudo apt-get -y install tmux
+sudo yum -y install tmux
+sudo yum -y install java-1.7.0-openjdk
 
-wget -qO - http://packages.confluent.io/deb/2.0/archive.key | sudo apt-key add -
-sudo add-apt-repository "deb [arch=amd64] http://packages.confluent.io/deb/2.0 stable main"
-sudo apt-get update && sudo apt-get -y install confluent-platform-2.11.7
+sudo rpm --import http://packages.confluent.io/rpm/2.0/archive.key
+
+sudo cat > /etc/yum.repos.d/confluent.repo << EOF
+[confluent-2.0]
+name=Confluent repository for 2.0.x packages
+baseurl=http://packages.confluent.io/rpm/2.0
+gpgcheck=1
+gpgkey=http://packages.confluent.io/rpm/2.0/archive.key
+enabled=1
+EOF
+
+sudo yum -y install confluent-platform-2.11.7
