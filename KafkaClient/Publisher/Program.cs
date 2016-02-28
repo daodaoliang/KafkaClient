@@ -54,15 +54,20 @@ namespace Publisher
 
             var tasksPerThread = TasksToSend/ThreadCount;
             var tasks = new Task[ThreadCount];
-            for (int i = 0; i < tasks.Length; i++)
-                tasks[i] = Task.Run(() => Publish(GenerateTasks(tasksPerThread)));
-            try
+
+            var time = DateTime.Now;
+            while (DateTime.Now.Subtract(time).TotalMinutes < 5)
             {
-                Task.WaitAll(tasks);
-            }
-            catch (AggregateException e)
-            {
-                Log.Error(e.InnerException.Message);
+                for (int i = 0; i < tasks.Length; i++)
+                    tasks[i] = Task.Run(() => Publish(GenerateTasks(tasksPerThread)));
+                try
+                {
+                    Task.WaitAll(tasks);
+                }
+                catch (AggregateException e)
+                {
+                    Log.Error(e.InnerException.Message);
+                }
             }
         }
     }
