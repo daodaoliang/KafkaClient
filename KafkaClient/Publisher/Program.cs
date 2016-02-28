@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using KafkaClient;
 using log4net;
 using Newtonsoft.Json;
+using KafkaClient.Logging;
 
 namespace Publisher
 {
@@ -49,6 +50,8 @@ namespace Publisher
         
         public static void Main(string[] args)
         {
+            Log4NetConfigurator.Configure();
+
             var tasksPerThread = TasksToSend/ThreadCount;
             var tasks = new Task[ThreadCount];
             for (int i = 0; i < tasks.Length; i++)

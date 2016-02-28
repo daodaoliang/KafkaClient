@@ -2,6 +2,7 @@
 using KafkaClient;
 using log4net;
 using Newtonsoft.Json;
+using KafkaClient.Logging;
 
 namespace Consumer
 {
@@ -16,6 +17,8 @@ namespace Consumer
 
         public static void Main(string[] args)
         {
+            Log4NetConfigurator.Configure();
+
             var consumer = new Consumer(Config.HostName, "TestConsumer", "1", Format.Json);
             while (true)
             {
