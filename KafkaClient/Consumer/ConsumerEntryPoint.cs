@@ -8,17 +8,21 @@ using Metrics;
 
 namespace Consumer
 {
-    public class Program
+    public class ConsumerEntryPoint
     {
-        public static readonly Meter Meter = Metric.Context("Consumer").Meter("HandleTask", Unit.Events); 
+        public static readonly Meter Meter = Metric.Context("Consumer").Meter("HandleTask", Unit.Events);
+        public static readonly Histogram Histogram = Metric.Context("Consumer").Histogram("Latency", Unit.Custom("ms"));
+
         public static ILog Log = LogManager.GetLogger("Consumer");
 
         public static readonly int ThreadCount = 4;
 
         public static void Handle(XTask task)
         {
+            var ms = (DateTime.UtcNow - task.Timestamp).TotalMilliseconds;
+            Log.Info($"Got {task.Name} Latency: {ms} ms.");
             Meter.Mark();
-            Log.Info($"Got {task.Name} Latency: {(DateTime.Now - task.Timestamp).TotalSeconds}");
+            Histogram.Update((long) ms);
         }
 
         public static void Consume(string instance)
