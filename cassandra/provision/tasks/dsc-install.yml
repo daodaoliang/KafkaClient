@@ -1,0 +1,5 @@
+- name: installing Datastax cassandra
+  yum: pkg=dsc21 state=installed
+
+- name: configuring cassandra
+  template: src=templates/cassandra.yaml dest=/etc/cassandra/conf/cassandra.yaml

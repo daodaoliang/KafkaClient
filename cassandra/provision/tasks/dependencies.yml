@@ -1,0 +1,13 @@
+- name: updating yum on host
+  shell: yum update -y
+
+- name: installing some dependencies
+  yum: pkg={{ item }} state=installed 
+  with_items:
+  - ncdu
+  - htop
+  - vim
+  - jna
+  - sysstat
+  - libselinux-python
+  - lsof

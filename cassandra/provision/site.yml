@@ -1,0 +1,8 @@
+---
+- hosts: all
+  tasks:
+    - include: tasks/dependencies.yml
+    - include: tasks/repositories.yml
+    - include: tasks/java-install.yml
+    - include: tasks/dsc-install.yml
+    - include: tasks/start-cassandra.yml

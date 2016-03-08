@@ -1,0 +1,5 @@
+- name: oracle java installation
+  shell: yum localinstall -y jdk-8u60-linux-x64.rpm
+
+- name: Remove OpenJDK
+  action: yum pkg=java-1.8.0-openjdk state=removed
