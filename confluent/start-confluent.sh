@@ -5,4 +5,6 @@
 (sleep 2; /usr/bin/kafka-server-start /etc/kafka/server.properties) &
 
 # Start REST server
-(sleep 4; /usr/bin/kafka-rest-start /etc/kafka-rest/kafka-rest.properties)
+(sleep 4; /usr/bin/kafka-rest-start /etc/kafka-rest/kafka-rest.properties) &
+
+(echo confluent started)
