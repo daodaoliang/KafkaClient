@@ -22,9 +22,9 @@ Run Kafka 0.8 benchmark:
 	$ cd ./kafka08-test
 	$ vagrant up
 	$ vagrant ssh
-	$ cd /vagrant
-	$ ./bench-create-topic.sh topic-name
-	$ ./bench-producer.sh topic-name
-	$ ./bench-consumer.sh topic-name
-	$ ./bench-end-to-end-latency.sh topic-name
-	$ ./bench-producer-consumer.sh topic-name
+	$ cd /vagrant/benchmark
+	$ ./create-topic.sh topic-name
+	$ ./test-producer.sh topic-name
+	$ ./test-consumer.sh topic-name
+	$ ./test-end-to-end-latency.sh topic-name
+	$ ./test-producer-consumer.sh topic-name

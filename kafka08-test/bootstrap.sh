@@ -6,4 +6,11 @@ cd /home/vagrant
 git clone https://github.com/jkreps/kafka
 cd kafka
 ./gradlew clean && ./gradlew jar && ./gradlew releaseTarGz -x signArchives
-sudo cp /vagrant/config/* config
+
+if [ -d "/vagrant/config" ]; then
+	sudo cp /vagrant/config/* config
+fi
+
+if [ -f "/vagrant/kafka-run-class.sh" ]; then
+	sudo cp /vagrant/kafka-run-class.sh bin
+fi
