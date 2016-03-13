@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Threading.Tasks;
 using KafkaClient;
 using log4net;
@@ -27,19 +28,29 @@ namespace Consumer
 
         public static void Consume(string instance)
         {
-            var consumer = new Consumer(Config.HostName, "TestConsumer", instance, Format.Json);
+            var consumer = new Consumer(Config.HostName, Config.ConsumerName, instance, Format.Json);
             while (true)
             {
+                string recv;
                 try
                 {
-                    var recv = consumer.GetMessages(Config.TopicName);
+                    recv = consumer.GetMessages(Config.TopicName);
+                }
+                catch (Exception e)
+                {
+                    Log.Error(e.Message);
+                    continue;
+                }
+
+                try
+                {
                     var obj = JsonConvert.DeserializeObject<dynamic[]>(recv);
                     foreach (var o in obj)
                         Handle(o.value.ToObject<XTask>());
                 }
                 catch (Exception e)
                 {
-                    Log.Error(e.Message);
+                    Log.Error($"Error deserializing messages: {recv}");
                 }
             }
         }

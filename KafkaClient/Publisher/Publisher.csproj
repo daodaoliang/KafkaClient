@@ -59,6 +59,7 @@
   <ItemGroup>
     <Compile Include="PublisherEntryPoint.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestPublisher.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

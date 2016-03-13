@@ -15,3 +15,4 @@ enabled=1
 EOF
 
 sudo yum -y install confluent-platform-2.11.7
+sudo cp /vagrant/kafka-rest.properties /etc/kafka-rest

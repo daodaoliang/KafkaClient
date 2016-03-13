@@ -16,7 +16,7 @@ namespace Publisher
         public static int TaskNumber = 0;
         public static object TaskNumberLock = new object();
 
-        public static int ThreadCount = 4;
+        public static int ThreadCount = 1;
         public static int TaskSize = 1024;
         public static int TasksToSend = 1024;
 
@@ -70,29 +70,31 @@ namespace Publisher
         {
             Log4NetConfigurator.Configure();
 
-            var tasksPerThread = TasksToSend/ThreadCount;
-            var tasks = new Task[ThreadCount];
+            TestPublisher.Main(args);
 
-            var time = DateTime.UtcNow;
-            while (DateTime.UtcNow.Subtract(time).TotalMinutes < 5)
-            {
-                var elapsed = DateTime.UtcNow.Subtract(time).TotalSeconds;
-                if ((int) (elapsed*1000)%250 == 0)
-                {
-                    Log.Info($"Time elapsed: {elapsed}. Messages sent: {TaskNumber}.");
-                }
+            //var tasksPerThread = TasksToSend / ThreadCount;
+            //var tasks = new Task[ThreadCount];
 
-                for (int i = 0; i < tasks.Length; i++)
-                    tasks[i] = Task.Run(() => Publish(GenerateTasks(tasksPerThread)));
-                try
-                {
-                    Task.WaitAll(tasks);
-                }
-                catch (AggregateException e)
-                {
-                    Log.Error(e.InnerException.Message);
-                }
-            }
+            //var time = DateTime.UtcNow;
+            //while (DateTime.UtcNow.Subtract(time).TotalMinutes < 5)
+            //{
+            //    var elapsed = DateTime.UtcNow.Subtract(time).TotalSeconds;
+            //    if ((int)(elapsed * 1000) % 250 == 0)
+            //    {
+            //        Log.Info($"Time elapsed: {elapsed}. Messages sent: {TaskNumber}.");
+            //    }
+
+            //    for (int i = 0; i < tasks.Length; i++)
+            //        tasks[i] = Task.Run(() => Publish(GenerateTasks(tasksPerThread)));
+            //    try
+            //    {
+            //        Task.WaitAll(tasks);
+            //    }
+            //    catch (AggregateException e)
+            //    {
+            //        Log.Error(e.InnerException.Message);
+            //    }
+            //}
         }
     }
 }
