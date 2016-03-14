@@ -70,31 +70,29 @@ namespace Publisher
         {
             Log4NetConfigurator.Configure();
 
-            TestPublisher.Main(args);
+            var tasksPerThread = TasksToSend / ThreadCount;
+            var tasks = new Task[ThreadCount];
 
-            //var tasksPerThread = TasksToSend / ThreadCount;
-            //var tasks = new Task[ThreadCount];
+            var time = DateTime.UtcNow;
+            while (DateTime.UtcNow.Subtract(time).TotalMinutes < 5)
+            {
+                var elapsed = DateTime.UtcNow.Subtract(time).TotalSeconds;
+                if ((int)(elapsed * 1000) % 250 == 0)
+                {
+                    Log.Info($"Time elapsed: {elapsed}. Messages sent: {TaskNumber}.");
+                }
 
-            //var time = DateTime.UtcNow;
-            //while (DateTime.UtcNow.Subtract(time).TotalMinutes < 5)
-            //{
-            //    var elapsed = DateTime.UtcNow.Subtract(time).TotalSeconds;
-            //    if ((int)(elapsed * 1000) % 250 == 0)
-            //    {
-            //        Log.Info($"Time elapsed: {elapsed}. Messages sent: {TaskNumber}.");
-            //    }
-
-            //    for (int i = 0; i < tasks.Length; i++)
-            //        tasks[i] = Task.Run(() => Publish(GenerateTasks(tasksPerThread)));
-            //    try
-            //    {
-            //        Task.WaitAll(tasks);
-            //    }
-            //    catch (AggregateException e)
-            //    {
-            //        Log.Error(e.InnerException.Message);
-            //    }
-            //}
+                for (int i = 0; i < tasks.Length; i++)
+                    tasks[i] = Task.Run(() => Publish(GenerateTasks(tasksPerThread)));
+                try
+                {
+                    Task.WaitAll(tasks);
+                }
+                catch (AggregateException e)
+                {
+                    Log.Error(e.InnerException.Message);
+                }
+            }
         }
     }
 }
