@@ -12,4 +12,4 @@ cd /home/vagrant/kafka
 # Start Kafka
 (sleep 2; bin/kafka-server-start.sh config/server.properties > /vagrant/kafka-logs/server-log.txt) & 
 
-(echo Kafka 0.9 started, see logs at /vagrant/kafka-logs)
+(echo Kafka 0.9.1 started, see logs at /vagrant/kafka-logs)
