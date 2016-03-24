@@ -9,4 +9,10 @@ mkdir -p /home/vagrant/kafka && cd /home/vagrant/kafka
 
 tar -xvzf /home/vagrant/kafka.tgz --strip 1
 
-sudo cp /vagrant/server.properties /home/vagrant/kafka/config
+if [ -d "/vagrant/config" ]; then
+	sudo cp /vagrant/config/* config
+fi
+
+if [ -f "/vagrant/kafka-run-class.sh" ]; then
+	sudo cp /vagrant/kafka-run-class.sh bin
+fi
