@@ -1,0 +1,40 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+unless Vagrant.has_plugin?("vagrant-hostmanager")
+  raise 'vagrant-hostmanager is not installed! run "vagrant plugin install vagrant-hostmanager" to fix'
+end
+
+NETWORK = '192.168.33.'
+NAME = 'kafka'
+NODE_COUNT = 3
+NODE_ZERO_IP = 20
+NODE_VM_MEMORY = '2048'
+
+nodes = []
+(1..NODE_COUNT).each do |i|
+    name = NAME + i.to_s
+    ip = NETWORK + (NODE_ZERO_IP + i).to_s
+    nodes << {'name' => name, 'ip' => ip}
+end
+
+Vagrant.configure(2) do |config|
+    config.vm.box = "geerlingguy/centos7"
+    config.hostmanager.enabled = true
+    config.hostmanager.manage_host = true
+    config.hostmanager.manage_guest = true
+    config.hostmanager.ignore_private_ip = false
+    config.hostmanager.include_offline = true
+    nodes.each_with_index do |node, i|
+        config.vm.define node['name'] do |nodecfg|
+            nodecfg.vm.hostname = node['name']
+            nodecfg.vm.network :private_network, ip: node['ip']
+            nodecfg.vm.provider :virtualbox do |v|
+                v.name = node['name']
+                v.customize ["modifyvm", :id, "--memory", NODE_VM_MEMORY]
+            end
+            nodecfg.vm.provision :shell, path: "bootstrap.sh", args: (i+1).to_s
+            nodecfg.vm.provision :shell, path: "start-kafka.sh", run: "always", args: (i+1).to_s
+        end
+    end
+end
