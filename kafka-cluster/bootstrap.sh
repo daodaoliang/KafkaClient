@@ -25,7 +25,7 @@ log.retention.hours=168
 log.segment.bytes=1073741824
 log.retention.check.interval.ms=300000
 zookeeper.connect=192.168.33.21:2181,192.168.33.22:2181,192.168.33.23:2181
-zookeeper.connection.timeout.ms=120000
+zookeeper.connection.timeout.ms=1200000
 EOF
 
 sudo cat > /home/vagrant/kafka/config/zookeeper.properties << EOF
