@@ -3,3 +3,4 @@ project(librdkafka_test)
 
 add_subdirectory(librdkafka)
 add_subdirectory(test_producer)
+add_subdirectory(test_consumer)
