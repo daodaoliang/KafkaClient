@@ -10,6 +10,18 @@ long get_seconds()
     time_t t = time(0);
     return t;
 }
+int i = 0;
+void f(rd_kafka_t *rk, const rd_kafka_message_t *rkmessage, void *opaque)
+{
+    if (rkmessage->_private != NULL)
+        ((void( *)())rkmessage->_private)();
+    printf("%d: %d\n", i++, rkmessage->len);
+}
+
+void f1()
+{
+    printf("Opaque");
+}
 
 int main(int argc, char *argv[])
 {
@@ -22,7 +34,7 @@ int main(int argc, char *argv[])
     {
         host = "192.168.33.12:9092";
         topic_name = "test2";
-        count = 10000 * 1000;
+        count = 100;
         size = 100;
     }
     else
@@ -44,6 +56,9 @@ int main(int argc, char *argv[])
 
     rd_kafka_conf_t *conf = rd_kafka_conf_new();
     
+
+    rd_kafka_conf_set_dr_msg_cb(conf, f);
+
     rd_kafka_conf_set(conf, "batch.num.messages", "100", errstr, errsize);
     printf("batch.num.messages:error: %s\n", errstr);
     
@@ -63,7 +78,7 @@ int main(int argc, char *argv[])
     int enobufs = 0;
     while (true)
     {
-        if (rd_kafka_produce(topic, partition, 0, payload, size, NULL, 0, NULL) == -1)
+        if (rd_kafka_produce(topic, partition, 0, payload, size, NULL, 0, f1) == -1)
         {
             enobufs++;
             //printf("Failed to produce to topic %s partition %d: %d %s\n", topic_name, partition, errno, rd_kafka_err2str(rd_kafka_last_error()));
