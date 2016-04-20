@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using RdKafka.RdKafka;
 
 namespace RdKafka
 {
@@ -64,5 +65,23 @@ namespace RdKafka
 
         [DllImport(DllName, CallingConvention = Convention)]
         public static extern void rd_kafka_conf_set_dr_msg_cb(IntPtr conf, DeliveryReportCallback dr_cb);
+
+        [DllImport(DllName, CallingConvention = Convention)]
+        public static extern int rd_kafka_consume_start(IntPtr rkt, int partition, long offset);
+
+        [DllImport(DllName, CallingConvention = Convention)]
+        public static extern ErrorCode rd_kafka_last_error();
+
+        [DllImport(DllName, CallingConvention = Convention)]
+        public static extern string rd_kafka_err2str(ErrorCode err);
+
+        [DllImport(DllName, CallingConvention = Convention)]
+        public static extern IntPtr rd_kafka_consume(IntPtr rkt, int partition, int timeout_ms);
+
+        [DllImport(DllName, CallingConvention = Convention)]
+        public static extern void rd_kafka_message_destroy(IntPtr rkmessage);
+
+        [DllImport(DllName, CallingConvention = Convention)]
+        public static extern void rd_kafka_consume_stop(IntPtr rkt, int partition);
     }
 }

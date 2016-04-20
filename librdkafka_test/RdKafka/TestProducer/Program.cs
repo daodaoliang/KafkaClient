@@ -38,7 +38,6 @@ namespace TestProducer
             var errstr = IntPtr.Zero;
             var conf = Internal.rd_kafka_conf_new();
 
-            var stats = new Stats(count, 5000, Console.WriteLine);
 
             Internal.rd_kafka_conf_set_dr_msg_cb(conf, (IntPtr rk, ref rd_kafka_message msg, IntPtr opaque) =>
             {
@@ -48,15 +47,17 @@ namespace TestProducer
                 cb();
             });
 
-            Internal.rd_kafka_conf_set(conf, "batch.num.messages", "100", errstr, errsize);
-            Internal.rd_kafka_conf_set(conf, "queue.buffering.max.ms", "100", errstr, errsize);
-            Internal.rd_kafka_conf_set(conf, "queue.buffering.max.messages", "10000000", errstr, errsize);
+//            Internal.rd_kafka_conf_set(conf, "batch.num.messages", "100", errstr, errsize);
+//            Internal.rd_kafka_conf_set(conf, "queue.buffering.max.ms", "10", errstr, errsize);
+//            Internal.rd_kafka_conf_set(conf, "queue.buffering.max.messages", "10000000", errstr, errsize);
 
             var kafka = Internal.rd_kafka_new(RdKafkaType.Producer, conf, errstr, errsize);
             Internal.rd_kafka_brokers_add(kafka, host);
             var topicConf = Internal.rd_kafka_topic_conf_new();
             var topic = Internal.rd_kafka_topic_new(kafka, topicName, topicConf);
 
+            var stats = new Stats(count, 5000, Console.WriteLine);
+            var queueFull = 0;
             for (int i = 0; i < count; i++)
             {
                 var sendStart = DateTimeExtensions.CurrentTimeMillis();
@@ -66,11 +67,12 @@ namespace TestProducer
                 {
                     Internal.rd_kafka_poll(kafka, 10);
                     gch.Free();
+                    queueFull++;
                     continue;
                 }
                 Internal.rd_kafka_poll(kafka, 0);
             }
-
+            
             while (Internal.rd_kafka_outq_len(kafka) > 0)
                 Internal.rd_kafka_poll(kafka, 100);
 
@@ -78,6 +80,7 @@ namespace TestProducer
             Internal.rd_kafka_destroy(kafka);
 
             stats.PrintTotal();
+            Console.WriteLine(queueFull);
         }
     }
 }

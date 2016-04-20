@@ -29,6 +29,7 @@ namespace TestConsumer
             var totalMessagesRead = 0L;
             var totalBytesRead = 0L;
 
+
         }
     }
 }
