@@ -61,9 +61,9 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy /y $(ProjectDir)..\..\build\librdkafka\Release\librdkafka.dll $(ProjectDir)$(OutDir)
-copy /y $(ProjectDir)..\..\external\dll\zlib.dll $(ProjectDir)$(OutDir)
-copy /y $(ProjectDir)..\..\external\dll\zlib.dll $(ProjectDir)$(OutDir)zlib1.dll
+    <PostBuildEvent>copy /y $(ProjectDir)..\..\built_with_cmake\build\librdkafka\Release\librdkafka.dll $(ProjectDir)$(OutDir)
+copy /y $(ProjectDir)..\..\built_with_cmake\external\dll\zlib.dll $(ProjectDir)$(OutDir)
+copy /y $(ProjectDir)..\..\built_with_cmake\external\dll\zlib.dll $(ProjectDir)$(OutDir)zlib1.dll
 </PostBuildEvent>
   </PropertyGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
