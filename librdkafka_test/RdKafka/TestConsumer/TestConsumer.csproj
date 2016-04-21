@@ -60,9 +60,7 @@
     <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.1.2.1\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.1.2.1\build\Microsoft.Net.Compilers.props'))" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>copy /y $(ProjectDir)..\..\built_with_cmake\build\librdkafka\Release\librdkafka.dll $(ProjectDir)$(OutDir)
-copy /y $(ProjectDir)..\..\built_with_cmake\external\dll\zlib.dll $(ProjectDir)$(OutDir)
-copy /y $(ProjectDir)..\..\built_with_cmake\external\dll\zlib.dll $(ProjectDir)$(OutDir)zlib1.dll
+    <PostBuildEvent>copy /y $(ProjectDir)..\..\librdkafka\win32\Debug\librdkafka.dll $(ProjectDir)$(OutDir)
 </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
