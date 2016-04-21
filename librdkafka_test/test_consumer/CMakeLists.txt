@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 2.6)
 project(test_consumer)
 
-include_directories(../librdkafka)
+include_directories(../librdkafka/src)
 
 add_executable(test_consumer
     main.c

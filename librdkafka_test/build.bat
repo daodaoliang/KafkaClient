@@ -4,4 +4,4 @@ mkdir build
 cd build
 cmake ..
 set msbuild="%ProgramFiles(x86)%\MSBuild\12.0\Bin\MsBuild.exe"
-%msbuild% librdkafka.sln /target:Rebuild /p:Configuration=Release /verbosity:m
+%msbuild% librdkafka_test.sln /target:Rebuild /p:Configuration=Release /verbosity:m

@@ -60,7 +60,7 @@
     <Error Condition="!Exists('..\packages\Microsoft.Net.Compilers.1.2.1\build\Microsoft.Net.Compilers.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Net.Compilers.1.2.1\build\Microsoft.Net.Compilers.props'))" />
   </Target>
   <PropertyGroup>
-    <PostBuildEvent>copy /y $(ProjectDir)..\..\build\Release\librdkafka.dll $(ProjectDir)$(OutDir)
+    <PostBuildEvent>copy /y $(ProjectDir)..\..\build\librd\Release\librdkafka.dll $(ProjectDir)$(OutDir)
 copy /y $(ProjectDir)..\..\external\dll\zlib.dll $(ProjectDir)$(OutDir)
 copy /y $(ProjectDir)..\..\external\dll\zlib.dll $(ProjectDir)$(OutDir)zlib1.dll
 </PostBuildEvent>
