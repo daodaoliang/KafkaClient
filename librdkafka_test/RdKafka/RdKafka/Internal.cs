@@ -18,6 +18,26 @@ namespace RdKafka
         public IntPtr _private;
     }
 
+    [StructLayout(LayoutKind.Sequential)]
+    public struct rd_kafka_metadata
+    {
+        public int broker_cnt;
+        public IntPtr brokers;
+        public int topic_cnt;
+        public IntPtr topics;
+        public int orig_broker_id;
+        public string orig_broker_name;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct rd_kafka_metadata_topic
+    {
+        public string topic;
+        public int partition_cnt;
+        public IntPtr partitions;
+        public ErrorCode err;
+    }
+
     public class Internal
     {
         private const string DllName = "librdkafka";
@@ -83,5 +103,10 @@ namespace RdKafka
 
         [DllImport(DllName, CallingConvention = Convention)]
         public static extern void rd_kafka_consume_stop(IntPtr rkt, int partition);
+
+        [DllImport(DllName, CallingConvention = Convention)]
+        public static extern ErrorCode rd_kafka_metadata(IntPtr rk, bool all_topics, IntPtr only_rkt, out IntPtr metadata, int timeout_ms);
+
+
     }
 }

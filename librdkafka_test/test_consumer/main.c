@@ -1,6 +1,7 @@
 #include "rdkafka.h"
 #include <stdlib.h>
 #include <time.h>
+#include <stdbool.h>
 
 long get_seconds()
 {
@@ -10,6 +11,7 @@ long get_seconds()
 
 void consume(const char *host, const char *topic_name, int count)
 {
+
     int partition = 0;
     int64_t start_offset = 0;
     char errstr[512];
@@ -20,31 +22,43 @@ void consume(const char *host, const char *topic_name, int count)
     rd_kafka_topic_conf_t *topic_conf = rd_kafka_topic_conf_new();
     rd_kafka_topic_t *topic = rd_kafka_topic_new(kafka, topic_name, topic_conf);
     
-    //rd_kafka_consume_start(topic, partition, start_offset);
-    if (rd_kafka_consume_start(topic, partition, start_offset) == -1){
-        rd_kafka_resp_err_t err = rd_kafka_last_error();
-        fprintf(stderr, "%% Failed to start consuming: %s\n",
-            rd_kafka_err2str(err));
-        if (err == RD_KAFKA_RESP_ERR__INVALID_ARG)
-            fprintf(stderr,
-            "%% Broker based offset storage "
-            "requires a group.id, "
-            "add: -X group.id=yourGroup\n");
-        exit(1);
+
+    rd_kafka_metadata_t *metadata;
+    int err = rd_kafka_metadata(kafka, false, topic, &metadata, 5000);
+    if (err != RD_KAFKA_RESP_ERR_NO_ERROR)
+    {
+        printf("Failed to aquire metadata :%s\n", rd_kafka_err2str(err));
+        return;
+    }
+    int partition_cnt = metadata->topics[0].partition_cnt;
+    for (int i = 0; i < partition_cnt; i++) {
+        if (rd_kafka_consume_start(topic, i, start_offset) == -1) {
+            rd_kafka_resp_err_t err = rd_kafka_last_error();
+            fprintf(stderr, "%% Failed to start consuming: %s\n",
+                rd_kafka_err2str(err));
+            if (err == RD_KAFKA_RESP_ERR__INVALID_ARG)
+                fprintf(stderr,
+                    "%% Broker based offset storage "
+                    "requires a group.id, "
+                    "add: -X group.id=yourGroup\n");
+            exit(1);
+        }
     }
     int s = get_seconds();
     int recv = 0;
     while (recv <count)
     {
         rd_kafka_poll(kafka, 0);
-        rd_kafka_message_t *message = rd_kafka_consume(topic, partition, 1000);
-        if (!message)
-            continue;
-        
-        recv++;
+        for (int i = 0; i < partition_cnt; i++) {
+            rd_kafka_message_t *message = rd_kafka_consume(topic, partition, 1000);
+            if (!message)
+                continue;
 
-//        printf("%d", message->len);
-        rd_kafka_message_destroy(message);
+            recv++;
+
+            printf("%d: %d\n", recv, message->len);
+            rd_kafka_message_destroy(message);
+        }
     }
     
     s = get_seconds() - s;
@@ -67,7 +81,7 @@ int main(int argc, char *argv[])
     {
         host = "192.168.33.12:9092";
         topic_name = "test2";
-        count = 10000 * 1000;
+        count = 1000 * 1000;
     }
     else
     {

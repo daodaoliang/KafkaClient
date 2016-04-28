@@ -34,7 +34,7 @@ int main(int argc, char *argv[])
     {
         host = "192.168.33.12:9092";
         topic_name = "test2";
-        count = 100;
+        count = 1000000;
         size = 100;
     }
     else
