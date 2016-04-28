@@ -49,11 +49,15 @@ namespace RdKafka
         [UnmanagedFunctionPointer(callingConvention: Convention)]
         public delegate void OpaqueCallback();
 
+        [UnmanagedFunctionPointer(callingConvention: Convention)]
+        public delegate void ConsumeCallback(ref rd_kafka_message rkmessage, IntPtr opaque);
+
         [DllImport(DllName, CallingConvention = Convention)]
         public static extern IntPtr rd_kafka_conf_new();
 
         [DllImport(DllName, CallingConvention = Convention)]
-        public static extern void rd_kafka_conf_set(IntPtr conf, string name, string value, IntPtr errstr, int errstr_size);
+        public static extern void rd_kafka_conf_set(IntPtr conf, string name, string value, IntPtr errstr,
+            int errstr_size);
 
         [DllImport(DllName, CallingConvention = Convention)]
         public static extern IntPtr rd_kafka_new(RdKafkaType type, IntPtr conf, IntPtr errstr, int errstr_size);
@@ -68,7 +72,8 @@ namespace RdKafka
         public static extern IntPtr rd_kafka_topic_new(IntPtr rk, string topic, IntPtr conf);
 
         [DllImport(DllName, CallingConvention = Convention)]
-        public static extern int rd_kafka_produce(IntPtr rkt, int partition, MsgFlags msgflags, byte[] payload, int len, byte[] key,
+        public static extern int rd_kafka_produce(IntPtr rkt, int partition, MsgFlags msgflags, byte[] payload, int len,
+            byte[] key,
             int keylen, IntPtr msg_opaque);
 
         [DllImport(DllName, CallingConvention = Convention)]
@@ -105,8 +110,11 @@ namespace RdKafka
         public static extern void rd_kafka_consume_stop(IntPtr rkt, int partition);
 
         [DllImport(DllName, CallingConvention = Convention)]
-        public static extern ErrorCode rd_kafka_metadata(IntPtr rk, bool all_topics, IntPtr only_rkt, out IntPtr metadata, int timeout_ms);
+        public static extern ErrorCode rd_kafka_metadata(IntPtr rk, bool all_topics, IntPtr only_rkt,
+            out IntPtr metadata, int timeout_ms);
 
-
+        [DllImport(DllName, CallingConvention = Convention)]
+        public static extern void rd_kafka_consume_callback(IntPtr rkt, int partition, int timeout_ms,
+            ConsumeCallback consume_cb, IntPtr opaque);
     }
 }

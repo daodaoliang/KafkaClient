@@ -3,10 +3,24 @@
 #include <time.h>
 #include <stdbool.h>
 
+int recv = 0;
+int bytes = 0;
+
 long get_seconds()
 {
     time_t t = time(0);
     return t;
+}
+
+void msg_consume(rd_kafka_message_t *message, void *opaque)
+{
+    if (!message) {
+        printf("Got null message: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
+        return;
+    }
+    recv++;
+    bytes += message->len;
+    rd_kafka_message_destroy(message);
 }
 
 void consume(const char *host, const char *topic_name, int count)
@@ -16,6 +30,11 @@ void consume(const char *host, const char *topic_name, int count)
     int64_t start_offset = 0;
     char errstr[512];
     rd_kafka_conf_t *conf = rd_kafka_conf_new();
+    
+    rd_kafka_conf_set(conf, "auto.commit.enable", "false", errstr, sizeof(errstr));
+    rd_kafka_conf_set(conf, "fetch.message.max.bytes", "10000000", errstr, sizeof(errstr));
+    rd_kafka_conf_set(conf, "fetch.message.min.bytes", "1000000", errstr, sizeof(errstr));
+    rd_kafka_conf_set(conf, "queued.min.messages", "1000000", errstr, sizeof(errstr));
     rd_kafka_t *kafka = rd_kafka_new(RD_KAFKA_CONSUMER, conf, errstr, sizeof(errstr));
     //rd_kafka_set_log_level(kafka, LOG_DEBUG);
     rd_kafka_brokers_add(kafka, host);
@@ -44,24 +63,44 @@ void consume(const char *host, const char *topic_name, int count)
             exit(1);
         }
     }
+
+    int batch_size = 10000;
+    rd_kafka_message_t **rkmessages = malloc(sizeof(rd_kafka_message_t *) * batch_size);
+    
     int s = get_seconds();
-    int recv = 0;
-    int bytes = 0;
+
+
     while (recv <count)
     {
-        for (int i = 0; i < partition_cnt; i++) {
+        //for (int i = 0; i < partition_cnt; i++) {
             rd_kafka_poll(kafka, 0);
-            rd_kafka_message_t *message = rd_kafka_consume(topic, partition, 1000);
-            if (!message) {
-                printf("Got null: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
-                rd_kafka_poll(kafka, 10);
-                continue;
+
+            //rd_kafka_consume_callback(topic, i, 1000, msg_consume, NULL);
+
+            int r = rd_kafka_consume_batch(topic, partition, 1000, rkmessages, batch_size);
+            if (r > 0)
+            {
+                //printf("Got %d msgs\n", r);
+                for (int j = 0; j < r; j++)
+                    msg_consume(rkmessages[j], NULL);
             }
-            recv++;
-            bytes += message->len;
-            //printf("%d: %d\n", recv, message->len);
-            rd_kafka_message_destroy(message);
-        }
+            else
+            {
+                //printf("Got null: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
+            }
+
+            //rd_kafka_message_t *message = rd_kafka_consume(topic, partition, 100);
+            //if (!message) {
+            //    //printf("Got null: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
+            //    //rd_kafka_poll(kafka, 10);
+            //    continue;
+            //}
+            //recv++;
+            //bytes += message->len;
+            ////printf("%d: %d\n", recv, message->len);
+            //
+            //rd_kafka_message_destroy(message);
+        //}
     }
     
     float mb = bytes / 1024.0 / 1024;

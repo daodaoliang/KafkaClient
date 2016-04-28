@@ -7,6 +7,9 @@ namespace TestConsumer
 {
     public class Program
     {
+        public static int recv = 0;
+        public static long bytes = 0;
+
         public static void Main(string[] args)
         {
             string host;
@@ -58,26 +61,34 @@ namespace TestConsumer
             }
 
             var s = DateTime.UtcNow;
-            var recv = 0;
-            var bytes = 0;
             while (recv < count)
             {
                 Internal.rd_kafka_poll(kafka, 0);
                 for (int i = 0; i < partition_cnt; i++)
                 {
-                    var msgPtr = Internal.rd_kafka_consume(topic, i, 1000);
-                    if (msgPtr == IntPtr.Zero) 
-                        continue;
-                    var msg = Marshal.PtrToStructure<rd_kafka_message>(msgPtr);
-                    recv++;
-                    bytes += msg.len;
+                    Internal.rd_kafka_consume_callback(topic, i, 1000,
+                        (ref rd_kafka_message rkmessage, IntPtr opaque) =>
+                        {
+                            if (rkmessage.err == 0)
+                            {
+                                bytes += rkmessage.len;
+                                recv++;
+                            }
+                        }, IntPtr.Zero);
+
+                    //var msgPtr = Internal.rd_kafka_consume(topic, i, 1000);
+                    //if (msgPtr == IntPtr.Zero) 
+                    //    continue;
+                    //var msg = Marshal.PtrToStructure<rd_kafka_message>(msgPtr);
+                    //recv++;
+                    //bytes += msg.len;
                     //Console.WriteLine($"{recv}: {msg.len}");
-                    Internal.rd_kafka_message_destroy(msgPtr);
+                    //Internal.rd_kafka_message_destroy(msgPtr);
                 }
             }
             var mb = bytes/1024.0/1024;
             var elapsed = (DateTime.UtcNow - s).TotalMilliseconds/1000;
-            
+            Console.WriteLine($"{elapsed} seconds elapsed");
             Console.WriteLine($"{(float)(mb/elapsed)} MB/sec");
 
             for (int i = 0; i < partition_cnt; i++)
