@@ -46,23 +46,28 @@ void consume(const char *host, const char *topic_name, int count)
     }
     int s = get_seconds();
     int recv = 0;
+    int bytes = 0;
     while (recv <count)
     {
-        rd_kafka_poll(kafka, 0);
         for (int i = 0; i < partition_cnt; i++) {
+            rd_kafka_poll(kafka, 0);
             rd_kafka_message_t *message = rd_kafka_consume(topic, partition, 1000);
-            if (!message)
+            if (!message) {
+                printf("Got null: %s\n", rd_kafka_err2str(rd_kafka_last_error()));
+                rd_kafka_poll(kafka, 10);
                 continue;
-
+            }
             recv++;
-
-            printf("%d: %d\n", recv, message->len);
+            bytes += message->len;
+            //printf("%d: %d\n", recv, message->len);
             rd_kafka_message_destroy(message);
         }
     }
     
+    float mb = bytes / 1024.0 / 1024;
     s = get_seconds() - s;
-    printf("%f", (float)count / s);
+
+    printf("%f MB/sec\n", (float)mb / s);
 
     rd_kafka_consume_stop(topic, partition);
     while (rd_kafka_outq_len(kafka) > 0)
