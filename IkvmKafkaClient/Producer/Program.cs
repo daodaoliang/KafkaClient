@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using java.util;
 using org.apache.kafka.clients.producer;
 using org.apache.kafka.common.serialization;
@@ -31,6 +32,8 @@ namespace Producer
 
             for (int i = 0; i < count; i++)
             {
+                //var payload = Encoding.UTF8.GetBytes(i.ToString());
+                //var record = new ProducerRecord(topic, payload);
                 var sendStart = DateTimeExtensions.CurrentTimeMillis();
                 var cb = new StatsCallback { Action = stats.NextCompletion(sendStart, payload.Length, stats) };
                 producer.send(record, cb);
